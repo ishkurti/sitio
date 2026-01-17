@@ -1,0 +1,826 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>name lastname | website</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600&family=Source+Code+Pro:wght@400;600&display=swap" rel="stylesheet">
+
+  <style>
+    body {
+      margin: 40px;
+      background-color: #ffffff;
+      font-family: 'Barlow', sans-serif;
+      color: #000;
+    }
+
+    .editor {
+      --gutter-width: 1.5em;
+      --code-indent: calc(var(--gutter-width) + 1.5em);
+      counter-reset: line;
+
+      --active-bg: rgba(37, 99, 235, 0.08);
+      --hover-bg: rgba(37, 99, 235, 0.04);
+      --caret: #2563eb;
+    }
+
+    /* Keep the "editor" parts monospace */
+    .title,
+    .toggle,
+    .line,
+    .line::before,
+    .comment,
+    .block-line {
+      font-family: 'Source Code Pro', monospace;
+    }
+
+    /* Title row */
+    .title-row {
+      display: flex;
+      align-items: center;
+      gap: 0.5em;
+      padding-left: var(--code-indent);
+      margin-bottom: 12px;
+      user-select: none;
+    }
+
+    /* Arrow button — aligned to gutter */
+    .toggle {
+      border: none;
+      background: none;
+      padding: 0;
+      color: #6b7280;
+      cursor: pointer;
+      line-height: 1;
+      width: var(--gutter-width);
+      text-align: right;
+      margin-left: calc(-1 * var(--code-indent));
+    }
+
+    .toggle:focus,
+    .toggle:focus-visible {
+      outline: none;
+    }
+
+    .title {
+      font-size: 18px;
+      font-weight: 600;
+      margin: 0;
+    }
+
+    /* Numbered lines */
+    .line {
+      position: relative;
+      padding-left: var(--code-indent);
+      line-height: 1.8;
+    }
+
+    .line::before {
+      counter-increment: line;
+      content: counter(line);
+      position: absolute;
+      left: 0;
+      width: var(--gutter-width);
+      text-align: right;
+      color: #9aa0a6;
+      font-weight: 400;
+      font-variant-numeric: tabular-nums;
+    }
+
+    /* Hover line highlight */
+    .line:hover {
+      background-color: var(--hover-bg);
+    }
+
+    /* Hover number color */
+    .line:hover::before {
+      color: var(--caret);
+    }
+
+    /* Comment-green nav items */
+    .comment {
+      color: #2ea043;
+      text-decoration: none;
+    }
+
+    .comment:hover {
+      text-decoration: underline;
+      color: #000;
+    }
+
+    /* Collapsed state */
+    .is-collapsed .nav {
+      display: none;
+    }
+
+    /* ---- Active nav line behavior ---- */
+
+    .nav .line {
+      cursor: pointer;
+      user-select: none;
+    }
+
+    .nav .line.is-active {
+      background-color: var(--active-bg);
+    }
+
+    /* Left selection bar (caret) */
+    .nav .line.is-active::after {
+      content: "";
+      position: absolute;
+      left: 0;
+      top: 0.15em;
+      bottom: 0.15em;
+      width: 3px;
+      background: var(--caret);
+      border-radius: 2px;
+    }
+
+    .nav .line.is-active::before {
+      color: var(--caret);
+      font-weight: 600;
+    }
+
+    .nav .line.is-active .comment {
+      color: #000;
+      text-decoration: none;
+    }
+
+    /* Hide // prefix only on active line */
+    .nav .line.is-active .prefix {
+      visibility: hidden;
+    }
+
+    /* ---- Gutter divider ONLY for nav ---- */
+    .nav {
+      position: relative;
+    }
+
+    .nav::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      left: calc(var(--gutter-width) + 0.75em);
+      width: 1px;
+      background: rgba(156, 163, 175, 0.35);
+      pointer-events: none;
+    }
+
+    /* ---- Content blocks (only one visible at a time) ---- */
+
+    .content {
+      margin-top: 22px;
+    }
+
+    .block {
+      margin: 18px 0 34px 0;
+      display: none;
+    }
+
+    .block.is-visible {
+      display: block;
+    }
+
+    .block-line {
+      padding-left: var(--code-indent);
+      line-height: 1.8;
+      color: #2563eb;
+      font-weight: 600;
+    }
+
+    .block-body {
+      padding-left: calc(var(--code-indent) + 1.5em);
+      margin: 10px 0;
+    }
+
+    .profile-container {
+      display: flex;
+      gap: 18px;
+      align-items: flex-start;
+      flex-wrap: wrap;
+    }
+
+    .profile {
+      width: 180px;
+      max-width: 40vw;
+      height: auto;
+      border-radius: 2px;
+    }
+
+    /* text align values adjusted */
+    .text {
+      max-width: 600px;
+      font-family: 'Barlow', sans-serif;
+    }
+
+    .text p {
+      margin: 0 0 12px 0;
+      font-size: 15px;
+      line-height: 1.55;
+    }
+
+    .media {
+      margin-top: 18px;
+    }
+
+    .mapa {
+      max-width: 580px;
+      width: 100%;
+      height: auto;
+    }
+
+    /* ---------- Sound Atlas styles ---------- */
+    .section-title {
+      font-size: 18px;
+      font-weight: 600;
+      margin: 2px 0 14px 0;
+    }
+
+    .image-row {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+      margin: 10px 0 14px 0;
+      max-width: 590px;
+    }
+
+    .image-row img {
+      width: 100%;
+      height: auto;
+      display: block;
+      border-radius: 2px;
+    }
+
+    .hover-underline {
+      text-decoration: none;
+      border-bottom: 1px solid rgba(0,0,0,0.25);
+    }
+
+    .hover-underline:hover {
+      border-bottom-color: rgba(0,0,0,0.7);
+    }
+
+    .audio-card {
+      max-width: 560px;
+      margin: 18px 0 14px 0;
+      padding: 14px 14px 12px 14px;
+      border: 1px solid #fdcbcb;
+      border-radius: 10px;
+      background: #fffbe6;
+    }
+
+    .audio-title {
+      font-weight: 600;
+      margin-bottom: 6px;
+    }
+
+    .audio-note {
+      font-weight: 400;
+      color: rgba(0,0,0,0.55);
+      font-size: 14px;
+    }
+
+    .audio-meta {
+      color: rgba(0,0,0,0.7);
+      font-size: 14px;
+      line-height: 1.45;
+      margin-bottom: 10px;
+    }
+
+    audio {
+      width: 100%;
+    }
+
+    /* ---------------------------
+       Subtle gallery + lightbox (aligned with your text column)
+       --------------------------- */
+    .gallery {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;  /* align left with text */
+      gap: 10px;
+      margin: 26px 0 8px;
+      max-width: 600px;            /* match .text */
+    }
+
+    .gallery figure {
+      margin: 0;
+    }
+
+    .gallery img {
+      width: 120px;
+      height: 90px;
+      object-fit: cover;
+      border-radius: 8px;
+      opacity: 0.9;
+      cursor: pointer;
+      transition: transform 0.25s ease, opacity 0.25s ease;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+      display: block;
+    }
+
+    .gallery img:hover {
+      transform: translateY(-2px) scale(1.03);
+      opacity: 1;
+    }
+
+    .gallery-caption {
+      text-align: center;            /* align with text */
+      font-size: 13px;
+      color: #555;
+      margin: 6px 0 2px;
+      font-style: italic;
+      max-width: 600px;            /* match .text */
+    }
+
+    .footnote {
+      max-width: 600px;
+      margin: 14px 0 0 0;
+      font-size: 13px;
+      line-height: 1.5;
+      font-style: italic;
+      color: rgba(0,0,0,0.75);
+      text-align: left;
+    }
+
+    /* Lightbox modal */
+    .lightbox {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.7);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+      z-index: 9999;
+    }
+    .lightbox.open { display: flex; }
+
+    .lightbox-inner {
+      position: relative;
+      max-width: 92vw;
+      max-height: 92vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .lightbox img {
+      max-width: 90vw;
+      max-height: 82vh;
+      border-radius: 12px;
+      box-shadow: 0 2px 20px rgba(0,0,0,0.35);
+      display: block;
+    }
+
+    .lb-btn {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      border: none;
+      background: rgba(255,255,255,0.9);
+      color: #0c6bd2;
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      cursor: pointer;
+      font-size: 18px;
+      line-height: 1;
+    }
+    .lb-prev { left: -46px; }
+    .lb-next { right: -46px; }
+
+    .lb-close {
+      position: absolute;
+      top: -44px;
+      right: -4px;
+      border: none;
+      background: rgba(255,255,255,0.95);
+      color: #333;
+      border-radius: 999px;
+      padding: 4px 10px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+
+    .lb-caption {
+      position: absolute;
+      bottom: -34px;
+      left: 0;
+      right: 0;
+      text-align: center;
+      color: #fff;
+      font-size: 14px;
+      line-height: 1.3;
+      opacity: 0.9;
+    }
+
+    /* Mobile responsiveness */
+    @media (max-width: 768px) {
+      body { margin: 20px; }
+      .image-row { grid-template-columns: 1fr; }
+      .image-row img { max-width: 100%; }
+    }
+
+    @media (max-width: 640px) {
+      .gallery { max-width: 100%; gap: 8px; }
+      .gallery img { width: 29vw; height: 22vw; }
+      .lb-prev { left: -36px; }
+      .lb-next { right: -36px; }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="editor" id="editor">
+    <div class="title-row" id="titleRow" role="button" tabindex="0" aria-controls="nav" aria-expanded="true">
+      <button class="toggle" id="toggleBtn" aria-label="Collapse navigation">▾</button>
+      <h1 class="title">name lastname</h1>
+    </div>
+
+    <div class="nav" id="nav">
+      <div class="line">
+        <a class="comment" href="#about"><span class="prefix">//</span> about</a>
+      </div>
+      <div class="line">
+        <a class="comment" href="#research"><span class="prefix">//</span> research</a>
+      </div>
+      <div class="line">
+        <a class="comment" href="#sound-atlas"><span class="prefix">//</span> sound atlas</a>
+      </div>
+      <div class="line">
+        <a class="comment" href="#teaching"><span class="prefix">//</span> teaching</a>
+      </div>
+      <div class="line">
+        <a class="comment" href="#cv"><span class="prefix">//</span> cv</a>
+      </div>
+    </div>
+
+    <div class="content" id="content">
+      <!-- ABOUT -->
+      <div id="about" class="block">
+        <div class="block-line">.about {</div>
+
+        <div class="block-body">
+          <div class="profile-container">
+            <div class="text">
+              <p>I am a geographer with over a decade of experience collaborating with communities and organizations across Latin America and Amazonia. My work centers on territorial, cultural, and oral history mapping as tools for supporting collective rights and self-governance.</p>
+              <p>I specialize in community-based mapping methods and cartographies, including facilitating field trainings, designing data stewardship strategies, and producing maps for legal advocacy. My approach is grounded in long-term partnerships and a commitment to challenging dominant narratives by centering local and Indigenous perspectives.</p>
+              <p>I am fluent in English, Spanish, Italian, and Albanian, and am currently learning Portuguese.</p>
+              <p>In my free time, I enjoy listening to analog music and writing deliciously vanilla code.</p>
+              <p>Open to collaborations. You can reach me at: arupomaps<strong>[at]</strong>gmail<strong>[dot]</strong>com.</p>
+
+              <p>
+                <a
+                  href="https://www.linkedin.com/in/inashkurti"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  class="hover-underline"
+                >
+                  LinkedIn
+                </a>
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <div class="block-line">}</div>
+      </div>
+
+      <!-- RESEARCH -->
+      <div id="research" class="block">
+        <div class="block-line">.research {</div>
+
+        <div class="block-body">
+          <div class="text">
+            <p>My research and professional work sit at the intersection of digital geographies and feminist political ecology. I explore community-based mapping methodologies with a focus on data sovereignty, oral histories, and the development of culturally responsive digital tools and archives.</p>
+            <p>I am particularly interested in how mapping and data stewardship can be co-designed to support Indigenous self-determination and territorial governance in Amazonia and beyond.</p>
+            <p>Since 2012, I have collaborated with Indigenous communities and organizations across the Amazon regions of Ecuador, Peru, and Colombia to map ancestral territories and monitor threats to land, culture, and collective rights. I have also worked on applied research and advocacy projects in the United States, Albania, Greece, Paraguay, Mozambique, and Kenya.</p>
+            <p>My practice integrates diverse cartographic tools and media, including but not limited to: pen, paper, oral narratives, audiovisual recordings, historical maps, QGIS, the ArcGIS Suite, Adobe Illustrator, Leaflet, and Mapbox.</p>
+
+            <div class="media">
+              <img src="./images/mapa.png" alt="Participatory mapping work" class="mapa" loading="lazy" />
+            </div>
+          </div>
+        </div>
+
+        <div class="block-line">}</div>
+      </div>
+
+      <!-- SOUND ATLAS -->
+      <div id="sound-atlas" class="block">
+        <div class="block-line">.soundAtlas {</div>
+
+        <div class="block-body">
+          <div class="section-title">Atlas of Albanian Sound</div>
+
+          <div class="image-row">
+            <img src="./images/sound2.png" alt="Sound Image 1" loading="lazy">
+            <img src="./images/sound3.png" alt="Sound Image 2" loading="lazy">
+          </div>
+
+          <div class="text">
+            <p>Started in 2023, the Atlas of Albanian Sound is an ongoing creative project that maps the entanglements of music, memory, and place during an often overlooked period: early 20th century Albania. The fall of the Ottoman Empire and the redrawing of nation-state borders across the Balkans displaced and attempted to erase many communities, particularly Muslim, Roma, and Jewish groups. For Albanian communities, these new borders reconfigured life and mobility in significant ways. Bringing together 78 rpm recordings, discographies, and historical research, this project traces sonic geographies across Albania and its diasporas by uncovering the music and the musicians who carried their stories through sound.</p>
+
+            <p>Through collaborations with private collectors in the US and Greece, I am currently digitizing and remastering more than 300 songs originally pressed on shellac discs—from the first known recording of the Albanian language in 1906 to the haunting voice of
+              <a class="hover-underline" href="https://www.youtube.com/watch?v=z8SRLunraPo" target="_blank" rel="noopener noreferrer">Hafize Asllani</a>
+              in Leskovik, Labë
+              <a class="hover-underline" href="https://www.nts.live/shows/guests/episodes/albanian-iso-polyphony-27th-april-2017" target="_blank" rel="noopener noreferrer">iso-polyphonies</a>,
+              highland <em>çifteli</em> riffs, the marching-band anthems once performed for King Zog... and everything in between. I am also building a digital database that documents the songs, the musicians, and the communities behind them. The goal is to share these recordings through a freely accessible interactive archive, where sound, place, and history can be explored together.</p>
+
+            <p>As a geographer, I am interested in how speaking and listening—or, the <em><strong>oral</strong></em> and the <strong><em>aural</em></strong>—can serve as cartographic method, and how this in turn can reveal connections, displacements, and resonances that remain invisible on conventional maps and archives. Through this work, I've come to understand sound and music as living, collective spaces of memory, and as invitations to reimagine how we chart and navigate our world(s).</p>
+
+            <p>What sorts of cartographies emerge from these songs?</p>
+            <p>Can the map serve as archive?</p>
+            <p>Can the archive serve as map?</p>
+            <p>How does past resonate with present?</p>
+
+            <p>Sound is the territory. Listening is the atlas.*</p>
+          </div>
+
+          <div class="audio-card">
+            <div class="audio-title">
+              Valle Me Dy — Konitsa <span class="audio-note">(real name unknown)</span>
+            </div>
+            <div class="audio-meta">
+              Recorded in Athens, 1947, on the Balkan label.<br>
+              Courtesy of Christopher King. Transfer by Ina Shkurti.
+            </div>
+
+            <audio
+              id="valleAudio"
+              controls
+              preload="metadata"
+              controlsList="nodownload noplaybackrate noremoteplayback"
+              oncontextmenu="return false"
+            >
+              Your browser does not support the audio element.
+            </audio>
+          </div>
+
+          <div class="text">
+            <p><em>This project is a labor of love and has benefited greatly from the generosity of the collectors, musicians, elders, and scholars who have shared their knowledge and time with me.</em></p>
+            <p><em>Interactive map archive coming soon.</em></p>
+          </div>
+
+          <div class="gallery" id="gallery">
+            <img src="./images/atlas1.jpg" alt="RCA Victor's Delvino Zeza Delvina." loading="lazy">
+            <img src="./images/atlas2.jpg" alt="Columbia 12 incher." loading="lazy">
+            <img src="./images/atlas3.jpg" alt="Building the database. Translating analog to digital." loading="lazy">
+            <img src="./images/atlas4.jpg" alt="Workstation." loading="lazy">
+            <img src="./images/atlas5.jpg" alt="Postcard of Roma musicians from Durrës. Circa 1930(?)" loading="lazy">
+            <img src="./images/atlas6.jpg" alt="Some light reading. Edward Capps, 1963." loading="lazy">
+            <img src="./images/atlas7.jpg" alt="What remains of Faik Konitza's house." loading="lazy">
+            <img src="./images/atlas8.jpg" alt="A çamiko dance engraved on the entrance of Hamko's House." loading="lazy">
+            <img src="./images/atlas9.jpg" alt="Cats of Konitsa. Do they speak Greek or Albanian?" loading="lazy">
+            <img src="./images/atlas10.jpg" alt="Vjosa River Valley. Photo by Ina Shkurti." loading="lazy">
+          </div>
+          <div class="gallery-caption">Click any image to view larger</div>
+
+          <p class="footnote">
+            * Inspired by David Turnbull’s
+            <a class="hover-underline" href="http://territories.indigenousknowledge.org/home/contents.html" target="_blank" rel="noopener noreferrer">
+              <em>Maps Are Territories: Science Is an Atlas</em> (1989)
+            </a>,
+            this phrase extends his claim that maps make and organize worlds into the register of sound. I see the sonic as both <strong>being</strong> and <strong>knowing</strong>.
+          </p>
+        </div>
+
+        <div class="block-line">}</div>
+      </div>
+
+      <!-- TEACHING -->
+      <div id="teaching" class="block">
+        <div class="block-line">.teaching {</div>
+        <div class="block-body">
+          <div class="text">
+            <p>Add your teaching content here.</p>
+          </div>
+        </div>
+        <div class="block-line">}</div>
+      </div>
+
+      <!-- CV -->
+      <div id="cv" class="block">
+        <div class="block-line">.cv {</div>
+
+        <div class="block-body">
+          <div class="text">
+            <p>Add your CV here (e.g., a link to a PDF, or selected sections).</p>
+
+            <!-- Example: link to a PDF in your repo -->
+            <!--
+            <p>
+              <a class="hover-underline" href="./files/Ina_Shkurti_CV.pdf" target="_blank" rel="noopener noreferrer">
+                Download CV (PDF) →
+              </a>
+            </p>
+            -->
+          </div>
+        </div>
+
+        <div class="block-line">}</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Lightbox modal -->
+  <div class="lightbox" id="lightbox" aria-hidden="true" role="dialog" aria-label="Image viewer">
+    <div class="lightbox-inner">
+      <button class="lb-btn lb-prev" id="lbPrev" aria-label="Previous image">‹</button>
+      <img id="lbImg" alt="">
+      <button class="lb-btn lb-next" id="lbNext" aria-label="Next image">›</button>
+      <button class="lb-close" id="lbClose" aria-label="Close">Close ✕</button>
+      <div class="lb-caption" id="lbCaption"></div>
+    </div>
+  </div>
+
+  <script>
+    // ---------- Nav collapse ----------
+    const editor = document.getElementById('editor');
+    const titleRow = document.getElementById('titleRow');
+    const toggleBtn = document.getElementById('toggleBtn');
+
+    const nav = document.getElementById('nav');
+    const navLines = Array.from(nav.querySelectorAll('.line'));
+    const blocks = Array.from(document.querySelectorAll('.block'));
+
+    function setCollapsed(collapsed) {
+      editor.classList.toggle('is-collapsed', collapsed);
+      toggleBtn.textContent = collapsed ? '▸' : '▾';
+      titleRow.setAttribute('aria-expanded', String(!collapsed));
+      toggleBtn.setAttribute('aria-label', collapsed ? 'Expand navigation' : 'Collapse navigation');
+    }
+
+    function toggleNav() {
+      const collapsed = editor.classList.contains('is-collapsed');
+      setCollapsed(!collapsed);
+    }
+
+    toggleBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      toggleNav();
+    });
+
+    titleRow.addEventListener('click', toggleNav);
+
+    titleRow.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        toggleNav();
+      }
+    });
+
+    function setActiveLine(lineEl) {
+      navLines.forEach(el => el.classList.remove('is-active'));
+      if (lineEl) lineEl.classList.add('is-active');
+    }
+
+    function showBlock(id) {
+      blocks.forEach(b => b.classList.remove('is-visible'));
+      const target = document.getElementById(id);
+      if (target) target.classList.add('is-visible');
+    }
+
+    function getIdFromHash() {
+      const hash = (window.location.hash || '#about').replace('#', '');
+      return hash || 'about';
+    }
+
+    function syncUI() {
+      const id = getIdFromHash();
+      showBlock(id);
+
+      const line = navLines.find(lineEl => {
+        const a = lineEl.querySelector('a');
+        return a && a.getAttribute('href') === '#' + id;
+      });
+      setActiveLine(line || navLines[0]);
+    }
+
+    navLines.forEach((lineEl) => {
+      const link = lineEl.querySelector('a');
+      if (!link) return;
+
+      lineEl.addEventListener('click', (e) => {
+        const isModifiedClick = e.metaKey || e.ctrlKey || e.shiftKey || e.altKey;
+        if (isModifiedClick) return;
+
+        e.preventDefault();
+        window.location.hash = link.getAttribute('href');
+      });
+
+      link.addEventListener('click', (e) => {
+        const isModifiedClick = e.metaKey || e.ctrlKey || e.shiftKey || e.altKey;
+        if (isModifiedClick) return;
+
+        e.preventDefault();
+        window.location.hash = link.getAttribute('href');
+      });
+    });
+
+    window.addEventListener('hashchange', syncUI);
+    syncUI();
+
+    // ---------- Disable right-click on audio ----------
+    document.addEventListener('contextmenu', (e) => {
+      if (e.target.closest && e.target.closest('audio')) e.preventDefault();
+    });
+
+    // ---------- Mount audio ----------
+    (async function mountAudio() {
+      const audio = document.getElementById('valleAudio');
+      if (!audio) return;
+
+      const srcPath = './audio/812-A.mp3';
+      try {
+        const res = await fetch(srcPath, { credentials: 'same-origin' });
+        if (!res.ok) throw new Error('HTTP ' + res.status);
+        const blob = await res.blob();
+        const url = URL.createObjectURL(blob);
+        audio.src = url;
+        audio.load();
+        window.addEventListener('beforeunload', () => URL.revokeObjectURL(url));
+      } catch (err) {
+        audio.src = srcPath;
+        audio.load();
+      }
+    })();
+
+    // ---------- Gallery Lightbox ----------
+    (function initLightbox() {
+      const gallery = document.getElementById('gallery');
+      if (!gallery) return;
+
+      const items = Array.from(gallery.querySelectorAll('img'));
+      if (!items.length) return;
+
+      const lb = document.getElementById('lightbox');
+      const lbImg = document.getElementById('lbImg');
+      const lbCaption = document.getElementById('lbCaption');
+      const prevBtn = document.getElementById('lbPrev');
+      const nextBtn = document.getElementById('lbNext');
+      const closeBtn = document.getElementById('lbClose');
+
+      let index = 0;
+
+      function open(i) {
+        index = i;
+        const img = items[index];
+        lbImg.src = img.src;
+        lbImg.alt = img.alt || '';
+        lbCaption.textContent = img.dataset.caption || img.alt || '';
+        lb.classList.add('open');
+        lb.setAttribute('aria-hidden', 'false');
+        document.body.style.overflow = 'hidden';
+      }
+
+      function close() {
+        lb.classList.remove('open');
+        lb.setAttribute('aria-hidden', 'true');
+        document.body.style.overflow = '';
+      }
+
+      function go(delta) {
+        index = (index + delta + items.length) % items.length;
+        const img = items[index];
+        lbImg.src = img.src;
+        lbImg.alt = img.alt || '';
+        lbCaption.textContent = img.dataset.caption || img.alt || '';
+      }
+
+      items.forEach((img, i) => {
+        img.addEventListener('click', () => open(i));
+      });
+
+      prevBtn.addEventListener('click', () => go(-1));
+      nextBtn.addEventListener('click', () => go(1));
+      closeBtn.addEventListener('click', close);
+
+      lb.addEventListener('click', (e) => {
+        if (e.target === lb) close();
+      });
+
+      document.addEventListener('keydown', (e) => {
+        if (!lb.classList.contains('open')) return;
+        if (e.key === 'Escape') close();
+        if (e.key === 'ArrowLeft') go(-1);
+        if (e.key === 'ArrowRight') go(1);
+      });
+
+      let startX = 0, down = false;
+      lbImg.addEventListener('pointerdown', (e) => { down = true; startX = e.clientX; });
+      lbImg.addEventListener('pointerup', (e) => {
+        if (!down) return;
+        const dx = e.clientX - startX;
+        if (dx < -40) go(1);
+        if (dx > 40) go(-1);
+        down = false;
+      });
+      lbImg.addEventListener('pointercancel', () => { down = false; });
+    })();
+  </script>
+</body>
+</html>
