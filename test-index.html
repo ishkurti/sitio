@@ -192,6 +192,12 @@
       position: relative; /* needed so section toggles can sit in the gutter */
     }
 
+    /* Make only the opening section lines clickable */
+    .block-head {
+      cursor: pointer;
+      user-select: none;
+    }
+
     .block-body {
       padding-left: calc(var(--code-indent) + 1.5em);
       margin: 10px 0;
@@ -223,11 +229,13 @@
 
     /* Collapsed bodies (per section) */
     .block.is-about-collapsed #aboutBody { display: none; }
-    .block.is-contact-collapsed #contactBody { display: none; }
+    .block.is-languages-collapsed #languagesBody { display: none; }
+    .block.is-education-collapsed #educationBody { display: none; }
     .block.is-research-collapsed #researchBody { display: none; }
+    .block.is-toolbox-collapsed #toolboxBody { display: none; }
     .block.is-sound-collapsed #soundBody { display: none; }
     .block.is-teaching-collapsed #teachingBody { display: none; }
-    .block.is-cv-collapsed #cvBody { display: none; }
+    .block.is-contact-collapsed #contactBody { display: none; }
 
     .profile-container {
       display: flex;
@@ -254,6 +262,11 @@
       font-size: 15px;
       line-height: 1.55;
     }
+
+    .block-body .text p:last-child {
+    margin-bottom: 0;
+    }
+
 
     .media {
       margin-top: 18px;
@@ -487,7 +500,7 @@
         <a class="comment" href="#teaching"><span class="prefix">//</span> teaching</a>
       </div>
       <div class="line">
-        <a class="comment" href="#cv"><span class="prefix">//</span> cv</a>
+        <a class="comment" href="#contact"><span class="prefix">//</span> contact</a>
       </div>
     </div>
 
@@ -496,7 +509,7 @@
       <div id="about" class="block">
 
         <!-- .about -->
-        <div class="block-line">
+        <div class="block-line block-head">
           <button class="block-toggle" id="aboutToggle" aria-label="Collapse about section" aria-expanded="true">▾</button>
           .about {
         </div>
@@ -504,37 +517,44 @@
         <div class="block-body" id="aboutBody">
           <div class="profile-container">
             <div class="text">
-              <p>I am a geographer with over a decade of experience collaborating with communities and organizations across Latin America and Amazonia. My work centers on territorial, cultural, and oral history mapping as tools for supporting collective rights and self-governance.</p>
+              <p><strong>I am a geographer with over a decade of experience collaborating with communities and organizations across Latin America and Amazonia.</strong> I work with digital mapping tools and methods to support social and environmental justice struggles.</p>
               <p>I specialize in community-based mapping methods, including facilitating field trainings, designing data stewardship strategies, and producing maps for legal advocacy. My approach is grounded in long-term partnerships and a commitment to challenging dominant narratives by centering local and Indigenous perspectives.</p>
-              <p>I am fluent in English, Spanish, Italian, and Albanian, and am learning Portuguese.</p>
-              <p>In my free time, I enjoy reading short stories and writing deliciously vanilla code.</p>
             </div>
           </div>
         </div>
 
         <div class="block-line">}</div>
 
-        <!-- .contact (NEW, aligned with .about) -->
-        <div class="block-line">
-          <button class="block-toggle" id="contactToggle" aria-label="Collapse contact section" aria-expanded="true">▾</button>
-          .contact {
-        </div>
+<!-- .languages (NEW, aligned with .about) -->
+<div class="block-line block-head">
+  <button class="block-toggle" id="languagesToggle" aria-label="Collapse languages section" aria-expanded="true">▾</button>
+  .languages {
+</div>
 
-        <div class="block-body" id="contactBody">
+<div class="block-body" id="languagesBody">
+  <div class="text">
+    <p><strong>Fluent:</strong> English, Spanish, Italian, Albanian;</p>
+    <p><strong>Intermediate-Advanced:</strong> Brazilian Portuguese;</p>
+    <p><strong>Basic:</strong> Kichwa.</p>
+  </div>
+</div>
+
+<div class="block-line">}</div>
+
+<!-- .education (NEW, aligned with .about) -->
+<div class="block-line block-head">
+  <button class="block-toggle" id="educationToggle" aria-label="Collapse education section" aria-expanded="true">▾</button>
+  .education {
+</div>
+
+
+        <div class="block-body" id="educationBody">
           <div class="text">
-            <p>Open to collaborations. </p>
-                
-                <p>You can reach me at: arupomaps<strong>[at]</strong>gmail<strong>[dot]</strong>com.</p>
-            <p>
-              <a
-                href="https://www.linkedin.com/in/inashkurti"
-                target="_blank"
-                rel="noopener noreferrer"
-                class="hover-underline"
-              >
-                LinkedIn
-              </a>
-            </p>
+            <p><strong>BA in Geography.</strong> University of Massachusetts Amherst.</p>
+            <p><strong>Certificate in Geographic Information Science and Technology.</strong> UMass Amherst.</p>
+            <p><strong>Current MA/PhD Student.</strong> University of North Carolina at Chapel Hill.</p>
+
+       
           </div>
         </div>
 
@@ -544,30 +564,45 @@
 
       <!-- RESEARCH -->
       <div id="research" class="block">
-        <div class="block-line">
+        <div class="block-line block-head">
           <button class="block-toggle" id="researchToggle" aria-label="Collapse research section" aria-expanded="true">▾</button>
           .research {
         </div>
 
         <div class="block-body" id="researchBody">
           <div class="text">
-            <p>I explore community-based mapping methodologies with a focus on data sovereignty, oral histories, and the development of culturally responsive digital tools and archives.</p>
-            <p>I am particularly interested in how mapping and data stewardship can be co-designed to support Indigenous self-determination and territorial governance in Amazonia and beyond.</p>
-            <p>Since 2012, I have collaborated with Indigenous communities and organizations across the Amazon regions of Ecuador, Peru, and Colombia to map ancestral territories and monitor threats to land, culture, and collective rights. I have also worked on applied research and advocacy projects in the United States, Albania, Greece, Paraguay, Mozambique, and Kenya.</p>
-            <p>My practice integrates diverse cartographic tools and media, including but not limited to: pen, paper, oral narratives, audiovisual recordings, historical maps, QGIS, the ArcGIS Suite, Adobe Illustrator, Leaflet, and Mapbox.</p>
 
-          <!--   <div class="media">
-              <img src="./images/mapa.png" alt="Participatory mapping work" class="mapa" loading="lazy" />
-            </div>-->
+            <p>My work centers around community-based digital methods with a focus on mapping, data sovereignty, and the development of culturally responsive digital tools and archives.</p>
+            <p>Since 2012, I have collaborated with Indigenous communities and organizations across the Amazon regions of Ecuador, Peru, and Colombia to map ancestral territories and monitor threats to land, culture, and collective rights. I have also worked on applied research and advocacy projects in the United States, Albania, Greece, Paraguay, Mozambique, and Kenya.</p>
+            <p>Over the years, I have learned that successful community-based work begins with careful listening and is sustained through iterative practice.</p>
+
           </div>
         </div>
 
         <div class="block-line">}</div>
-      </div>
+      <!-- .toolbox (NEW, inside research) -->
+<div class="block-line block-head">
+  <button class="block-toggle" id="toolboxToggle" aria-label="Collapse toolbox section" aria-expanded="true">▾</button>
+  .toolbox {
+</div>
+
+<div class="block-body" id="toolboxBody">
+  <div class="text">
+    <p>My practice integrates diverse cartographic tools and media, including but not limited to: <strong>pen, paper, oral narratives, audiovisual recordings, historical maps, QGIS, the ArcGIS Suite, Adobe Illustrator, Leaflet, Mapbox, JavaScript, html, and CSS.</strong></p>
+     
+    <div class="media">
+              <img src="./images/mapa.png" alt="Participatory mapping work" class="mapa" loading="lazy" />
+            </div>
+  </div>
+</div>
+
+<div class="block-line">}</div>
+
+</div>
 
       <!-- SOUND ATLAS -->
       <div id="sound-atlas" class="block">
-        <div class="block-line">
+        <div class="block-line block-head">
           <button class="block-toggle" id="soundToggle" aria-label="Collapse sound atlas section" aria-expanded="true">▾</button>
           .soundAtlas {
         </div>
@@ -652,7 +687,7 @@
 
       <!-- TEACHING -->
       <div id="teaching" class="block">
-        <div class="block-line">
+        <div class="block-line block-head">
           <button class="block-toggle" id="teachingToggle" aria-label="Collapse teaching section" aria-expanded="true">▾</button>
           .teaching {
         </div>
@@ -666,15 +701,27 @@
       </div>
 
       <!-- CV -->
-      <div id="cv" class="block">
-        <div class="block-line">
-          <button class="block-toggle" id="cvToggle" aria-label="Collapse cv section" aria-expanded="true">▾</button>
-          .cv {
+      <div id="contact" class="block">
+        <div class="block-line block-head">
+          <button class="block-toggle" id="contactToggle" aria-label="Collapse contact section" aria-expanded="true">▾</button>
+          .contact {
         </div>
 
-        <div class="block-body" id="cvBody">
+        <div class="block-body" id="contactBody">
           <div class="text">
-            <p>Add your CV here (e.g., a link to a PDF, or selected sections).</p>
+           <p><strong>Open to collaborations.</strong></p>
+
+            <p>You can reach me at: arupomaps<strong>[at]</strong>gmail<strong>[dot]</strong>com.</p>
+            <p>
+              <a
+                href="https://www.linkedin.com/in/inashkurti"
+                target="_blank"
+                rel="noopener noreferrer"
+                class="hover-underline"
+              >
+                LinkedIn
+              </a>
+            </p>
           </div>
         </div>
 
@@ -781,22 +828,32 @@
     window.addEventListener('hashchange', syncUI);
     syncUI();
 
-    // ---------- Section collapse (ABOUT/CONTACT/RESEARCH/SOUND/TEACHING/CV) ----------
+    // ---------- Section collapse (ABOUT/CONTACT/RESEARCH/SOUND/TEACHING/CONTACT) ----------
     (function initSectionCollapses() {
       const sections = [
-        { id: 'about',      toggleId: 'aboutToggle',    bodyId: 'aboutBody',    cls: 'is-about-collapsed',   label: 'about' },
-        { id: 'about',      toggleId: 'contactToggle',  bodyId: 'contactBody',  cls: 'is-contact-collapsed', label: 'contact' },
-        { id: 'research',   toggleId: 'researchToggle', bodyId: 'researchBody', cls: 'is-research-collapsed',label: 'research' },
-        { id: 'sound-atlas',toggleId: 'soundToggle',    bodyId: 'soundBody',    cls: 'is-sound-collapsed',   label: 'sound atlas' },
-        { id: 'teaching',   toggleId: 'teachingToggle', bodyId: 'teachingBody', cls: 'is-teaching-collapsed',label: 'teaching' },
-        { id: 'cv',         toggleId: 'cvToggle',       bodyId: 'cvBody',       cls: 'is-cv-collapsed',      label: 'cv' },
+        { id: 'about',       toggleId: 'aboutToggle',    bodyId: 'aboutBody',    cls: 'is-about-collapsed',    label: 'about' },
+        { id: 'about', toggleId: 'languagesToggle', bodyId: 'languagesBody', cls: 'is-languages-collapsed', label: 'languages' },
+        { id: 'about',       toggleId: 'educationToggle',  bodyId: 'educationBody',  cls: 'is-education-collapsed',  label: 'education' },
+        
+        { id: 'research',    toggleId: 'researchToggle', bodyId: 'researchBody', cls: 'is-research-collapsed', label: 'research' },
+        { id: 'research', toggleId: 'toolboxToggle', bodyId: 'toolboxBody', cls: 'is-toolbox-collapsed', label: 'toolbox' },
+
+        { id: 'sound-atlas', toggleId: 'soundToggle',    bodyId: 'soundBody',    cls: 'is-sound-collapsed',    label: 'sound atlas' },
+        { id: 'teaching',    toggleId: 'teachingToggle', bodyId: 'teachingBody', cls: 'is-teaching-collapsed', label: 'teaching' },
+        
+        { id: 'contact',          toggleId: 'contactToggle',       bodyId: 'contactBody',       cls: 'is-contact-collapsed',       label: 'contact' },
       ];
 
-      function setCollapsed(blockEl, toggleEl, collapsed, label, cls) {
+      function setCollapsed(blockEl, toggleEl, headEl, collapsed, label, cls, bodyId) {
         blockEl.classList.toggle(cls, collapsed);
         toggleEl.textContent = collapsed ? '▸' : '▾';
         toggleEl.setAttribute('aria-expanded', String(!collapsed));
         toggleEl.setAttribute('aria-label', collapsed ? `Expand ${label} section` : `Collapse ${label} section`);
+
+        if (headEl) {
+          headEl.setAttribute('aria-expanded', String(!collapsed));
+          headEl.setAttribute('aria-controls', bodyId);
+        }
       }
 
       sections.forEach(s => {
@@ -805,13 +862,43 @@
         const bodyEl = document.getElementById(s.bodyId);
         if (!blockEl || !toggleEl || !bodyEl) return;
 
-        setCollapsed(blockEl, toggleEl, false, s.label, s.cls);
+        const headEl = toggleEl.closest('.block-head');
 
+        // Make the opening line behave like a button (click + keyboard)
+        if (headEl) {
+          headEl.setAttribute('role', 'button');
+          headEl.setAttribute('tabindex', '0');
+        }
+
+        function toggleSection() {
+          const collapsed = blockEl.classList.contains(s.cls);
+          setCollapsed(blockEl, toggleEl, headEl, !collapsed, s.label, s.cls, s.bodyId);
+        }
+
+        // Initialize expanded
+        setCollapsed(blockEl, toggleEl, headEl, false, s.label, s.cls, s.bodyId);
+
+        // Toggle via arrow button
         toggleEl.addEventListener('click', (e) => {
           e.stopPropagation();
-          const collapsed = blockEl.classList.contains(s.cls);
-          setCollapsed(blockEl, toggleEl, !collapsed, s.label, s.cls);
+          toggleSection();
         });
+
+        // Toggle via clicking the section title line itself
+        if (headEl) {
+          headEl.addEventListener('click', (e) => {
+            // If the click originated from the button, the button handler already ran.
+            if (e.target && e.target.closest && e.target.closest('button')) return;
+            toggleSection();
+          });
+
+          headEl.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' || e.key === ' ') {
+              e.preventDefault();
+              toggleSection();
+            }
+          });
+        }
       });
     })();
 
